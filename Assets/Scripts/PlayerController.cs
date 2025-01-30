@@ -3,13 +3,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed;
+    public float moveSpeed;
     
-    // player movement with input system onMove
     public void OnMove(InputValue value)
     {
-        Vector2 inputVector = value.Get<Vector2>();
+        Vector3 inputVector = value.Get<Vector3>();
         Vector3 move = new Vector3(inputVector.x, 0, inputVector.y);
-        transform.position += move * speed * Time.deltaTime;
+        transform.position += move * moveSpeed * Time.deltaTime;
     }
 }
