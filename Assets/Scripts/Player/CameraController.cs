@@ -3,35 +3,27 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private float sensitivity;
-    public Transform playerBody;
-    private float rotationX;
-    private float rotationY;
-    private Vector2 entradaRaton;
-    
-    public void OnLook(InputValue value)
-    {
-        entradaRaton = value.Get<Vector2>();
-    }
-    
-    void Start()
+    [SerializeField] private float mouseSensitivity = 100f;
+    [SerializeField] private Transform playerBody;
+    private float xRotation = 0f;
+
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-    }
-    
-    public void ChangeGun(Transform gun)
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        playerBody = gun;
     }
 
-    void Update()
+    public void OnLook(InputValue value)
     {
-        float mouseX = entradaRaton.x * sensitivity * Time.deltaTime;
-        float mouseY = entradaRaton.y * sensitivity * Time.deltaTime;
-        rotationY -= mouseY;
-        rotationY = Mathf.Clamp(rotationY, -80f, 80f);
-        rotationX += mouseX;
-        playerBody.localRotation = Quaternion.Euler(rotationY, rotationX, 0f);
+        Vector2 lookInput = value.Get<Vector2>();
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        // Rotate the camera on the X-axis (up/down)
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        // Rotate the player on the Y-axis (left/right)
+        playerBody.Rotate(Vector3.up * mouseX);
     }
 }
