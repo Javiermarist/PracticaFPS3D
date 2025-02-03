@@ -68,6 +68,7 @@ public class Shooting : MonoBehaviour
             // Lanzar un raycast desde el centro de la cámara
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
+            Debug.DrawRay(ray.origin, ray.direction * 100, Color.red, 2f);
             Vector3 targetPoint;
 
             if (Physics.Raycast(ray, out hit))
