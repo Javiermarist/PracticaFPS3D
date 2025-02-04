@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 150}
   m_MaxSize: {x: 24288, y: 24288}
   vertical: 0
-  controlID: 894
+  controlID: 5060
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 150}
   m_MaxSize: {x: 16192, y: 24288}
   vertical: 1
-  controlID: 814
+  controlID: 4978
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 0
-  controlID: 815
+  controlID: 4979
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 775
+  controlID: 4937
   draggingID: 0
 --- !u!114 &9
 MonoBehaviour:
@@ -308,7 +308,7 @@ MonoBehaviour:
   - {fileID: 24}
   - {fileID: 25}
   m_Selected: 0
-  m_LastSelected: 1
+  m_LastSelected: 2
 --- !u!114 &13
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -333,7 +333,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 895
+  controlID: 5061
   draggingID: 0
 --- !u!114 &14
 MonoBehaviour:
@@ -1248,9 +1248,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 1.9677639, y: 1.9797006, z: -0.40215826}
+    m_Target: {x: -4.9662886, y: 1.5102167, z: 6.352931}
     speed: 2
-    m_Value: {x: 1.9677637, y: 1.9797006, z: -0.402158}
+    m_Value: {x: -4.9662886, y: 1.5102167, z: 6.352931}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1296,13 +1296,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.518
   m_Rotation:
-    m_Target: {x: -0.029796518, y: 0.89207214, z: -0.060887624, w: -0.44758874}
+    m_Target: {x: -0.009804616, y: 0.9740732, z: -0.045777816, w: -0.22296588}
     speed: 2
-    m_Value: {x: -0.03036274, y: 0.8923273, z: -0.062249165, w: -0.44604382}
+    m_Value: {x: -0.009467189, y: 0.9737883, z: -0.044300515, w: -0.22289965}
   m_Size:
-    m_Target: 0.93164617
+    m_Target: 1.5913215
     speed: 2
-    m_Value: 0.93164617
+    m_Value: 1.5913208
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1444,23 +1444,23 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: d4c8ffff
-      m_LastClickedID: -14124
-      m_ExpandedIDs: 10c0feff48f6ffff84fafffff8faffff68a4000082a40000daa60000eea600000aa7000016a7000024a7000044a7000048a700005ca7000064a700007ca70000bca70000
+      m_SelectedIDs: dac20000
+      m_LastClickedID: 0
+      m_ExpandedIDs: 8ef9fffff6fafffff8faffff6ca4000086a40000c4a4000052a50000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: Trump@Death
+        m_OriginalName: Trump@Death
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 0
+        m_UserData: -32106
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 4
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
         m_ClientGUIView: {fileID: 11}
@@ -1518,7 +1518,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Low Poly Guns/Models/Guns/assault1
+    - Assets/Animations/Trump
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1528,16 +1528,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Low Poly Guns/Models/Guns/assault1
+  - Assets/Animations/Trump
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\videojuegos\PracticaFPS3D
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 19}
-    m_SelectedIDs: 46ad0000
-    m_LastClickedID: 44358
-    m_ExpandedIDs: 0000000068a900006aa900006ca900007aa9000082a900003aad000042ad000000ca9a3b
+    scrollPos: {x: 0, y: 47}
+    m_SelectedIDs: bec20000
+    m_LastClickedID: 49854
+    m_ExpandedIDs: 0000000090a7000092a7000094a700009aa90000a6a90000bac20000bec2000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1566,7 +1566,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000068a900006aa900006ca9000000ca9a3b
+    m_ExpandedIDs: 0000000090a7000092a7000094a7000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1682,9 +1682,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 719
-    width: 1468
-    height: 267
+    y: 725
+    width: 1467
+    height: 261
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1698,7 +1698,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 42172
+  m_LastSelectedObjectID: -1290
 --- !u!114 &26
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1738,7 +1738,7 @@ MonoBehaviour:
   m_ObjectsLockedBeforeSerialization: []
   m_InstanceIDsLockedBeforeSerialization: 
   m_PreviewResizer:
-    m_CachedPref: 151
+    m_CachedPref: 303
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_LastInspectedObjectInstanceID: -1

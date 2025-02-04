@@ -9,6 +9,9 @@ TagManager:
   - Bullet
   - Floor
   - Wall
+  - Glock
+  - AK
+  - Shotgun
   layers:
   - Default
   - TransparentFX

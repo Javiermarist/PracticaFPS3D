@@ -1,16 +1,28 @@
+using System;
 using UnityEngine;
 
 public class Trump : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private float hp;
+
+    private void OnCollisionEnter(Collision other)
     {
-        
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            Bullet bullet = other.gameObject.GetComponent<Bullet>();
+            if (bullet != null)
+            {
+                TakeDamage(bullet.damage);
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage(float damage)
     {
-        
+        hp -= damage;
+        if (hp <= 0)
+        {
+            Die();
+        }
     }
 }
