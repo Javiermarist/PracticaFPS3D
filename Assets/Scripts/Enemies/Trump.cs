@@ -6,11 +6,16 @@ public class Trump : MonoBehaviour
     [SerializeField] private float hp;
     
     private PlayerController playerController;
-    [SerializeField] private Animator animator; // Reference to the Animator component
+    private Rigidbody[] rigidbodies;
+    
+    [SerializeField] private Animator animator;
     
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
+
+        rigidbodies = GetComponentsInChildren<Rigidbody>();
+        SetEnabled(false);
     }
 
     private void Update()
@@ -43,12 +48,34 @@ public class Trump : MonoBehaviour
             Die();
         }
     }
+    
+    void SetEnabled(bool enabled)
+    {
+        bool isKinematic = !enabled;
+        foreach (Rigidbody rb in rigidbodies)
+        {
+            rb.isKinematic = isKinematic;
+            rb.mass = 10;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        }
+        animator.enabled = !enabled;
+    }
 
     private void Die()
     {
         Debug.Log("Trump died");
-        animator.SetTrigger("Die");
+        SetEnabled(true);
+        // freeze position after 2 seconds
+        Invoke(nameof(FreezePosition), 1f);
         GetComponentInChildren<MeshRenderer>().enabled = false;
-        Destroy(gameObject, animator.GetCurrentAnimatorStateInfo(0).length);
+        enabled = false;
+    }
+    
+    private void FreezePosition()
+    {
+        foreach (Rigidbody rb in rigidbodies)
+        {
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
     }
 }

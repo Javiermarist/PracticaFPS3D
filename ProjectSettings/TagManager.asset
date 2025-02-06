@@ -12,11 +12,13 @@ TagManager:
   - Glock
   - AK
   - Shotgun
+  - Obstacle
+  - Cover
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Cover
   - Water
   - UI
   - 
