@@ -65,9 +65,17 @@ public class Trump : MonoBehaviour
         Debug.Log("Trump died");
         transform.GetChild(0).gameObject.SetActive(false);
         GetComponent<BoxCollider>().enabled = false;
-        
+    
         animator.enabled = false;
         SetEnabled(true);
-        enabled = false;
+        
+        MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour script in scripts)
+        {
+            if (script != this)
+            {
+                script.enabled = false;
+            }
+        }
     }
 }

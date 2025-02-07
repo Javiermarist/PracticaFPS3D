@@ -1,30 +1,75 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Security : MonoBehaviour
 {
-    [SerializeField] private float hp;
-    
+    [SerializeField] private float hp = 100f;
+    [SerializeField] private Transform[] waypoints; // Rutas de patrullaje
+    [SerializeField] private float searchDuration = 10f; // Tiempo buscando antes de volver a patrulla
+
+    private int currentWaypointIndex = 0;
     private PlayerController playerController;
+    private NavMeshAgent agent;
     private Rigidbody[] rigidbodies;
-    
-    [SerializeField] private Animator animator;
+    private Animator animator;
+    private LineOfSight lineOfSight;
+    private bool isSearching = false;
     
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
-
+        agent = GetComponent<NavMeshAgent>();
         rigidbodies = GetComponentsInChildren<Rigidbody>();
+        animator = GetComponent<Animator>();
+        lineOfSight = GetComponent<LineOfSight>();
+
         SetEnabled(false);
+        GoToNextWaypoint();
     }
 
     private void Update()
     {
-        if (playerController != null)
+        if (playerController != null && !isSearching)
         {
             Vector3 direction = playerController.transform.position - transform.position;
             direction.y = 0;
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
         }
+
+        if (!agent.pathPending && agent.remainingDistance < 0.5f && !isSearching)
+        {
+            GoToNextWaypoint();
+        }
+    }
+
+    private void GoToNextWaypoint()
+    {
+        if (waypoints.Length == 0) return;
+
+        agent.SetDestination(waypoints[currentWaypointIndex].position);
+        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+    }
+
+    public void SearchNearPlayer(Vector3 lastPosition)
+    {
+        StartCoroutine(SearchForPlayer(lastPosition));
+    }
+
+    private IEnumerator SearchForPlayer(Vector3 lastPosition)
+    {
+        isSearching = true;
+        float startTime = Time.time;
+
+        while (Time.time - startTime < searchDuration)
+        {
+            Vector3 randomOffset = new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f));
+            agent.SetDestination(lastPosition + randomOffset);
+            yield return new WaitForSeconds(3f);
+        }
+
+        isSearching = false;
+        GoToNextWaypoint();
     }
 
     private void OnCollisionEnter(Collision other)
@@ -47,7 +92,7 @@ public class Security : MonoBehaviour
             Die();
         }
     }
-    
+
     void SetEnabled(bool enabled)
     {
         bool isKinematic = !enabled;
@@ -57,24 +102,38 @@ public class Security : MonoBehaviour
             rb.mass = 10;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
+
         animator.enabled = !enabled;
     }
 
     private void Die()
     {
-        Debug.Log("Trump died");
+        Debug.Log("Security died");
+        transform.GetChild(0).gameObject.SetActive(false);
+        GetComponent<BoxCollider>().enabled = false;
+
+        animator.enabled = false;
         SetEnabled(true);
-        // freeze position after 2 seconds
-        Invoke(nameof(FreezePosition), 1f);
-        GetComponentInChildren<MeshRenderer>().enabled = false;
-        enabled = false;
-    }
-    
-    private void FreezePosition()
-    {
-        foreach (Rigidbody rb in rigidbodies)
+
+        if (agent != null)
         {
-            rb.constraints = RigidbodyConstraints.FreezeAll;
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        if (lineOfSight != null)
+        {
+            lineOfSight.StopAllCoroutines();
+            lineOfSight.enabled = false;
+        }
+
+        MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour script in scripts)
+        {
+            if (script != this)
+            {
+                script.enabled = false;
+            }
         }
     }
 }

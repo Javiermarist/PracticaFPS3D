@@ -5,28 +5,35 @@ using UnityEngine;
 public class LineOfSight : MonoBehaviour
 {
     [SerializeField] private GameObject target;
-    [SerializeField] private float detection_delay;
+    [SerializeField] private float detectionDelay = 0.5f;
     [Range(0, 360)]
-    [SerializeField] private int visionAngle;
-    [SerializeField] private GameObject bulletPrefab; // Reference to the bullet prefab
-    [SerializeField] private Transform bulletSpawnPoint; // Reference to the bullet spawn point
-    [SerializeField] private float shootInterval = 1f; // Interval between shots
+    [SerializeField] private int visionAngle = 90;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform bulletSpawnPoint;
+    [SerializeField] private float shootInterval = 1f;
 
-    private Collider player_collider;
-    private SphereCollider detection_collider;
-    private Coroutine detect_player;
+    private Collider playerCollider;
+    private SphereCollider detectionCollider;
+    private Coroutine detectPlayerCoroutine;
     private Coroutine shootCoroutine;
+    private Security security;
 
-    private void Awake() => detection_collider = this.GetComponent<SphereCollider>();
+    private void Awake()
+    {
+        detectionCollider = GetComponent<SphereCollider>();
+        security = GetComponentInParent<Security>();
+    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("player on range");
+            Debug.Log("Player detected by " + gameObject.name);
             target = other.gameObject;
-            detect_player = StartCoroutine(DetectPlayer());
-            player_collider = other;
+            playerCollider = other;
+
+            if (detectPlayerCoroutine == null)
+                detectPlayerCoroutine = StartCoroutine(DetectPlayer());
         }
     }
 
@@ -34,13 +41,25 @@ public class LineOfSight : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            Debug.Log("Player lost by " + gameObject.name);
             target = null;
-            StopCoroutine(detect_player);
+
+            if (detectPlayerCoroutine != null)
+            {
+                StopCoroutine(detectPlayerCoroutine);
+                detectPlayerCoroutine = null;
+            }
+
             if (shootCoroutine != null)
             {
                 StopCoroutine(shootCoroutine);
+                shootCoroutine = null;
             }
-            Debug.Log("player out of range of " + gameObject.name);
+
+            if (security != null)
+            {
+                security.SearchNearPlayer(other.transform.position);
+            }
         }
     }
 
@@ -48,47 +67,53 @@ public class LineOfSight : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(detection_delay);
+            yield return new WaitForSeconds(detectionDelay);
 
-            Vector3[] points = GetBoundingPoints(player_collider.bounds);
-
-            int points_hidden = 0;
+            Vector3[] points = GetBoundingPoints(playerCollider.bounds);
+            int pointsHidden = 0;
 
             foreach (Vector3 point in points)
             {
-                Vector3 target_direction = point - this.transform.position;
-                float target_distance = Vector3.Distance(this.transform.position, point);
-                float target_angle = Vector3.Angle(target_direction, this.transform.forward);
+                Vector3 targetDirection = point - transform.position;
+                float targetDistance = Vector3.Distance(transform.position, point);
+                float targetAngle = Vector3.Angle(targetDirection, transform.forward);
 
-                if (IsPointCovered(target_direction, target_distance) || target_angle > visionAngle)
-                    ++points_hidden;
+                if (IsPointCovered(targetDirection, targetDistance) || targetAngle > visionAngle)
+                    ++pointsHidden;
             }
 
-            if (points_hidden >= points.Length)
+            if (pointsHidden >= points.Length)
             {
-                Debug.Log("player is hidden");
-                StopCoroutine(shootCoroutine);
+                Debug.Log("Player is hidden");
+
+                if (shootCoroutine != null)
+                {
+                    StopCoroutine(shootCoroutine);
+                    shootCoroutine = null;
+                }
             }
             else
             {
-                Debug.Log("player is visible");
-                StartCoroutine(ShootAtPlayer());
+                Debug.Log("Player is visible");
+
+                if (shootCoroutine == null)
+                    shootCoroutine = StartCoroutine(ShootAtPlayer());
             }
         }
     }
 
-    private bool IsPointCovered(Vector3 target_direction, float target_distance)
+    private bool IsPointCovered(Vector3 targetDirection, float targetDistance)
     {
-        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, target_direction, detection_collider.radius);
-        Debug.DrawRay(this.transform.position, target_direction, Color.red, 1f);
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, targetDirection, detectionCollider.radius);
+        Debug.DrawRay(transform.position, targetDirection, Color.red, 1f);
 
         foreach (RaycastHit hit in hits)
         {
             if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Cover"))
             {
-                float cover_distance = Vector3.Distance(this.transform.position, hit.point);
+                float coverDistance = Vector3.Distance(transform.position, hit.point);
 
-                if (cover_distance < target_distance)
+                if (coverDistance < targetDistance)
                     return true;
             }
         }
@@ -97,19 +122,16 @@ public class LineOfSight : MonoBehaviour
 
     private Vector3[] GetBoundingPoints(Bounds bounds)
     {
-        Vector3[] bounding_points =
+        return new Vector3[]
         {
-            bounds.min,
-            bounds.max,
-            new Vector3( bounds.min.x, bounds.min.y, bounds.max.z ),
-            new Vector3( bounds.min.x, bounds.max.y, bounds.min.z ),
-            new Vector3( bounds.max.x, bounds.min.y, bounds.min.z ),
-            new Vector3( bounds.min.x, bounds.max.y, bounds.max.z ),
-            new Vector3( bounds.max.x, bounds.min.y, bounds.max.z ),
-            new Vector3( bounds.max.x, bounds.max.y, bounds.min.z )
+            bounds.min, bounds.max,
+            new Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
+            new Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
+            new Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
+            new Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
+            new Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
+            new Vector3(bounds.max.x, bounds.max.y, bounds.min.z)
         };
-
-        return bounding_points;
     }
 
     private IEnumerator ShootAtPlayer()
@@ -126,9 +148,7 @@ public class LineOfSight : MonoBehaviour
         if (target != null)
         {
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
-            Vector3 direction = (target.transform.position - bulletSpawnPoint.position).normalized;
-            bullet.transform.rotation = Quaternion.LookRotation(direction);
-            bullet.GetComponent<Rigidbody>().linearVelocity = direction * 20f; // Ajusta la velocidad según sea necesario
+            bullet.GetComponent<Rigidbody>().linearVelocity = (target.transform.position - bulletSpawnPoint.position).normalized * 20f;
         }
     }
 }
