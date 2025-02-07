@@ -55,7 +55,6 @@ public class Trump : MonoBehaviour
         foreach (Rigidbody rb in rigidbodies)
         {
             rb.isKinematic = isKinematic;
-            rb.mass = 10;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         }
         animator.enabled = !enabled;
@@ -64,18 +63,11 @@ public class Trump : MonoBehaviour
     private void Die()
     {
         Debug.Log("Trump died");
+        transform.GetChild(0).gameObject.SetActive(false);
+        GetComponent<BoxCollider>().enabled = false;
+        
+        animator.enabled = false;
         SetEnabled(true);
-        // freeze position after 2 seconds
-        Invoke(nameof(FreezePosition), 1f);
-        GetComponentInChildren<MeshRenderer>().enabled = false;
         enabled = false;
-    }
-    
-    private void FreezePosition()
-    {
-        foreach (Rigidbody rb in rigidbodies)
-        {
-            rb.constraints = RigidbodyConstraints.FreezeAll;
-        }
     }
 }

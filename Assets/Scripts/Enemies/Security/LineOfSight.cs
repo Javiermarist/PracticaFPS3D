@@ -1,22 +1,21 @@
 using System.Collections;
 using UnityEngine;
 
-
-
 [RequireComponent(typeof(SphereCollider))]
-
 public class LineOfSight : MonoBehaviour
 {
-
-
     [SerializeField] private GameObject target;
     [SerializeField] private float detection_delay;
     [Range(0, 360)]
     [SerializeField] private int visionAngle;
+    [SerializeField] private GameObject bulletPrefab; // Reference to the bullet prefab
+    [SerializeField] private Transform bulletSpawnPoint; // Reference to the bullet spawn point
+    [SerializeField] private float shootInterval = 1f; // Interval between shots
 
     private Collider player_collider;
-    private SphereCollider detection_collider;    
+    private SphereCollider detection_collider;
     private Coroutine detect_player;
+    private Coroutine shootCoroutine;
 
     private void Awake() => detection_collider = this.GetComponent<SphereCollider>();
 
@@ -37,7 +36,11 @@ public class LineOfSight : MonoBehaviour
         {
             target = null;
             StopCoroutine(detect_player);
-            Debug.Log("player out of range");
+            if (shootCoroutine != null)
+            {
+                StopCoroutine(shootCoroutine);
+            }
+            Debug.Log("player out of range of " + gameObject.name);
         }
     }
 
@@ -62,17 +65,21 @@ public class LineOfSight : MonoBehaviour
             }
 
             if (points_hidden >= points.Length)
+            {
                 Debug.Log("player is hidden");
+                StopCoroutine(shootCoroutine);
+            }
             else
+            {
                 Debug.Log("player is visible");
-            
+                StartCoroutine(ShootAtPlayer());
+            }
         }
     }
 
     private bool IsPointCovered(Vector3 target_direction, float target_distance)
     {
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, target_direction, detection_collider.radius);
-        //muestra el raycast en escena
         Debug.DrawRay(this.transform.position, target_direction, Color.red, 1f);
 
         foreach (RaycastHit hit in hits)
@@ -81,7 +88,7 @@ public class LineOfSight : MonoBehaviour
             {
                 float cover_distance = Vector3.Distance(this.transform.position, hit.point);
 
-                if (cover_distance < target_distance) 
+                if (cover_distance < target_distance)
                     return true;
             }
         }
@@ -105,4 +112,23 @@ public class LineOfSight : MonoBehaviour
         return bounding_points;
     }
 
+    private IEnumerator ShootAtPlayer()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(shootInterval);
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        if (target != null)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
+            Vector3 direction = (target.transform.position - bulletSpawnPoint.position).normalized;
+            bullet.transform.rotation = Quaternion.LookRotation(direction);
+            bullet.GetComponent<Rigidbody>().linearVelocity = direction * 20f; // Ajusta la velocidad según sea necesario
+        }
+    }
 }
