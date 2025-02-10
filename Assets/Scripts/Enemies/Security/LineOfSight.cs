@@ -7,21 +7,17 @@ public class LineOfSight : MonoBehaviour
     [SerializeField] private GameObject target;
     [SerializeField] private float detectionDelay = 0.5f;
     [Range(0, 360)]
-    [SerializeField] private int visionAngle = 90;
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private Transform bulletSpawnPoint;
-    [SerializeField] private float shootInterval = 1f;
+    [SerializeField] private int visionAngle;
 
     private Collider playerCollider;
     private SphereCollider detectionCollider;
     private Coroutine detectPlayerCoroutine;
-    private Coroutine shootCoroutine;
-    private Security security;
+    private EnemyState enemyState;
 
     private void Awake()
     {
         detectionCollider = GetComponent<SphereCollider>();
-        security = GetComponentInParent<Security>();
+        enemyState = GetComponentInParent<EnemyState>();
     }
 
     void OnTriggerEnter(Collider other)
@@ -30,10 +26,8 @@ public class LineOfSight : MonoBehaviour
         {
             Debug.Log("Player detected by " + gameObject.name);
             target = other.gameObject;
+            detectPlayerCoroutine = StartCoroutine(DetectPlayer());
             playerCollider = other;
-
-            if (detectPlayerCoroutine == null)
-                detectPlayerCoroutine = StartCoroutine(DetectPlayer());
         }
     }
 
@@ -41,25 +35,12 @@ public class LineOfSight : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player lost by " + gameObject.name);
+            Debug.Log("Player out of range of " + gameObject.name);
             target = null;
+            StopCoroutine(detectPlayerCoroutine);
 
-            if (detectPlayerCoroutine != null)
-            {
-                StopCoroutine(detectPlayerCoroutine);
-                detectPlayerCoroutine = null;
-            }
-
-            if (shootCoroutine != null)
-            {
-                StopCoroutine(shootCoroutine);
-                shootCoroutine = null;
-            }
-
-            if (security != null)
-            {
-                security.SearchNearPlayer(other.transform.position);
-            }
+            if (enemyState != null && enemyState.state != EnemyState.State.Alert)
+                enemyState.SetState(EnemyState.State.Patrol);
         }
     }
 
@@ -68,9 +49,10 @@ public class LineOfSight : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(detectionDelay);
-
-            Vector3[] points = GetBoundingPoints(playerCollider.bounds);
-            int pointsHidden = 0;
+        
+            Vector3[] points = GetBoundingPoints(playerCollider.bounds);   
+        
+            int points_hidden = 0;
 
             foreach (Vector3 point in points)
             {
@@ -79,41 +61,49 @@ public class LineOfSight : MonoBehaviour
                 float targetAngle = Vector3.Angle(targetDirection, transform.forward);
 
                 if (IsPointCovered(targetDirection, targetDistance) || targetAngle > visionAngle)
-                    ++pointsHidden;
+                    ++points_hidden;
             }
-
-            if (pointsHidden >= points.Length)
+        
+            if (points_hidden >= points.Length)
             {
                 Debug.Log("Player is hidden");
 
-                if (shootCoroutine != null)
+                if (enemyState != null && enemyState.state == EnemyState.State.Attack)
                 {
-                    StopCoroutine(shootCoroutine);
-                    shootCoroutine = null;
+                    // Si está en Attack y el jugador se oculta, pasa a Alert.
+                    enemyState.SetState(EnemyState.State.Alert, playerCollider.gameObject);  
+                }
+                else if (enemyState != null && enemyState.state != EnemyState.State.Alert)
+                {
+                    // Si no está en Attack o Alert, pasa a Patrol.
+                    enemyState.SetState(EnemyState.State.Patrol); 
                 }
             }
             else
             {
                 Debug.Log("Player is visible");
 
-                if (shootCoroutine == null)
-                    shootCoroutine = StartCoroutine(ShootAtPlayer());
+                if (enemyState != null && (enemyState.state == EnemyState.State.Alert || enemyState.state == EnemyState.State.Patrol))
+                {
+                    // Si estaba en Alert o Patrol, pasa a Attack.
+                    enemyState.SetState(EnemyState.State.Attack, playerCollider.gameObject);
+                }
             }
         }
     }
 
-    private bool IsPointCovered(Vector3 targetDirection, float targetDistance)
+    private bool IsPointCovered(Vector3 target_direction, float target_distance)
     {
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, targetDirection, detectionCollider.radius);
-        Debug.DrawRay(transform.position, targetDirection, Color.red, 1f);
+        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, target_direction, detectionCollider.radius);
+        Debug.DrawRay(transform.position, target_direction * detectionCollider.radius, Color.red, 0.1f);
 
         foreach (RaycastHit hit in hits)
         {
             if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Cover"))
             {
-                float coverDistance = Vector3.Distance(transform.position, hit.point);
+                float cover_distance = Vector3.Distance(this.transform.position, hit.point);
 
-                if (coverDistance < targetDistance)
+                if (cover_distance < target_distance) 
                     return true;
             }
         }
@@ -122,33 +112,18 @@ public class LineOfSight : MonoBehaviour
 
     private Vector3[] GetBoundingPoints(Bounds bounds)
     {
-        return new Vector3[]
+        Vector3[] bounding_points =
         {
-            bounds.min, bounds.max,
-            new Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
-            new Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
-            new Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
-            new Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
-            new Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
-            new Vector3(bounds.max.x, bounds.max.y, bounds.min.z)
+            bounds.min,
+            bounds.max,
+            new Vector3( bounds.min.x, bounds.min.y, bounds.max.z ),
+            new Vector3( bounds.min.x, bounds.max.y, bounds.min.z ),
+            new Vector3( bounds.max.x, bounds.min.y, bounds.min.z ),
+            new Vector3( bounds.min.x, bounds.max.y, bounds.max.z ),
+            new Vector3( bounds.max.x, bounds.min.y, bounds.max.z ),
+            new Vector3( bounds.max.x, bounds.max.y, bounds.min.z )
         };
-    }
 
-    private IEnumerator ShootAtPlayer()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(shootInterval);
-            Shoot();
-        }
-    }
-
-    private void Shoot()
-    {
-        if (target != null)
-        {
-            GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
-            bullet.GetComponent<Rigidbody>().linearVelocity = (target.transform.position - bulletSpawnPoint.position).normalized * 20f;
-        }
+        return bounding_points;
     }
 }

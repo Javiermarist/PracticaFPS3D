@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Colision detectada con " + collision.gameObject.name);
         Destroy(gameObject);
     }
 }
