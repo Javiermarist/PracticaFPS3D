@@ -70,12 +70,10 @@ public class LineOfSight : MonoBehaviour
 
                 if (enemyState != null && enemyState.state == EnemyState.State.Attack)
                 {
-                    // Si está en Attack y el jugador se oculta, pasa a Alert.
                     enemyState.SetState(EnemyState.State.Alert, playerCollider.gameObject);  
                 }
                 else if (enemyState != null && enemyState.state != EnemyState.State.Alert)
                 {
-                    // Si no está en Attack o Alert, pasa a Patrol.
                     enemyState.SetState(EnemyState.State.Patrol); 
                 }
             }
@@ -85,7 +83,6 @@ public class LineOfSight : MonoBehaviour
 
                 if (enemyState != null && (enemyState.state == EnemyState.State.Alert || enemyState.state == EnemyState.State.Patrol))
                 {
-                    // Si estaba en Alert o Patrol, pasa a Attack.
                     enemyState.SetState(EnemyState.State.Attack, playerCollider.gameObject);
                 }
             }

@@ -5,8 +5,8 @@ using UnityEngine.AI;
 public class Security : MonoBehaviour
 {
     [SerializeField] private float hp = 100f;
-    [SerializeField] private Transform[] waypoints; // Rutas de patrullaje
-    [SerializeField] private float searchDuration = 10f; // Tiempo buscando antes de volver a patrulla
+    [SerializeField] private Transform[] waypoints;
+    [SerializeField] private float searchDuration = 10f;
 
     private int currentWaypointIndex = 0;
     private PlayerController playerController;
@@ -14,8 +14,10 @@ public class Security : MonoBehaviour
     private Rigidbody[] rigidbodies;
     private Animator animator;
     private LineOfSight lineOfSight;
+    private EnemyState enemyState; // Referencia al script EnemyState
     private bool isSearching = false;
-    
+    private bool isDead = false;
+
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
@@ -23,6 +25,7 @@ public class Security : MonoBehaviour
         rigidbodies = GetComponentsInChildren<Rigidbody>();
         animator = GetComponent<Animator>();
         lineOfSight = GetComponent<LineOfSight>();
+        enemyState = GetComponent<EnemyState>(); // Obtiene el componente EnemyState
 
         SetEnabled(false);
         GoToNextWaypoint();
@@ -30,11 +33,20 @@ public class Security : MonoBehaviour
 
     private void Update()
     {
-        if (playerController != null && !isSearching)
+        if (isDead) return;
+
+        if (enemyState != null && enemyState.state == EnemyState.State.Attack && playerController != null)
         {
+            // Si está en estado de ataque, mirar al jugador
             Vector3 direction = playerController.transform.position - transform.position;
             direction.y = 0;
-            transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+        else if (agent.velocity.sqrMagnitude > 0.1f) // Si no está atacando, mirar hacia adelante
+        {
+            Vector3 moveDirection = agent.velocity.normalized;
+            moveDirection.y = 0;
+            transform.rotation = Quaternion.LookRotation(moveDirection);
         }
 
         if (!agent.pathPending && agent.remainingDistance < 0.5f && !isSearching)
@@ -109,6 +121,8 @@ public class Security : MonoBehaviour
     private void Die()
     {
         Debug.Log("Security died");
+        isDead = true;
+
         transform.GetChild(0).gameObject.SetActive(false);
         GetComponent<BoxCollider>().enabled = false;
 
@@ -125,6 +139,13 @@ public class Security : MonoBehaviour
         {
             lineOfSight.StopAllCoroutines();
             lineOfSight.enabled = false;
+        }
+
+        if (enemyState != null)
+        {
+            enemyState.SetState(EnemyState.State.Patrol);
+            enemyState.StopAllCoroutines();
+            enemyState.enabled = false;
         }
 
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();

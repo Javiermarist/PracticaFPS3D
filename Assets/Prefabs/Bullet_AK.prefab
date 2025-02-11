@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 6467498051205405371}
   - component: {fileID: 4573750840623640108}
   m_Layer: 0
-  m_Name: AK_Bullet
-  m_TagString: Untagged
+  m_Name: Bullet_AK
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
