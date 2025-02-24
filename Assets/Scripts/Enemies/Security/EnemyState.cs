@@ -55,7 +55,14 @@ public class EnemyState : MonoBehaviour
 
             if (newState == State.Patrol)
             {
-                ResumeMovement();
+                if (agent != null)
+                {
+                    ResumeMovement();
+                }
+                else
+                {
+                    Debug.LogError("No se ha asignado un NavMeshAgent.");
+                }
             }
             else if (newState == State.Alert && player != null)
             {

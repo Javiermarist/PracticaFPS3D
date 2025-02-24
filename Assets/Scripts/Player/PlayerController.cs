@@ -3,9 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float gravity = 9.81f;
-    [SerializeField] private float jumpHeight = 1f;
+    [SerializeField] private float speed;
+    [SerializeField] private float gravity;
+    [SerializeField] private float jumpHeight;
 
     private Vector2 moveInput;
     private Vector3 velocity;

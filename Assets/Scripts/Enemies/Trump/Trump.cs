@@ -7,15 +7,16 @@ public class Trump : MonoBehaviour
     
     private PlayerController playerController;
     private Rigidbody[] rigidbodies;
-    private LineOfSightTrump lineOfSight; // Referencia al script de disparo
+    private LineOfSightTrump lineOfSight;
     
     [SerializeField] private Animator animator;
+    public ScriptMenu scriptMenu;
     
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
         rigidbodies = GetComponentsInChildren<Rigidbody>();
-        lineOfSight = GetComponent<LineOfSightTrump>(); // Obtener referencia
+        lineOfSight = GetComponent<LineOfSightTrump>();
 
         SetEnabled(false);
     }
@@ -65,8 +66,7 @@ public class Trump : MonoBehaviour
     private void Die()
     {
         Debug.Log(gameObject.name + " died");
-
-        // Notificar a LineOfSightTrump que debe detenerse
+        
         if (lineOfSight != null)
         {
             lineOfSight.Die();
@@ -76,8 +76,7 @@ public class Trump : MonoBehaviour
         GetComponent<BoxCollider>().enabled = false;
         animator.enabled = false;
         SetEnabled(true);
-
-        // Desactivar todos los scripts menos este
+        
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
@@ -86,5 +85,7 @@ public class Trump : MonoBehaviour
                 script.enabled = false;
             }
         }
+
+        scriptMenu.ShowWin();
     }
 }
