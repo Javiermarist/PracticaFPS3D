@@ -65,42 +65,38 @@ public class Shooting : MonoBehaviour
     {
         if (bulletPrefab != null && firePoint != null && playerCamera != null)
         {
+            // Definir un LayerMask para ignorar la capa de los enemigos (debe estar en el índice correcto)
+            int layerMask = ~LayerMask.GetMask("Enemy"); // El ~ invierte la máscara para ignorarla
+
             // Lanzar un raycast desde el centro de la cámara
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
             Debug.DrawRay(ray.origin, ray.direction * 100, Color.red, 2f);
             Vector3 targetPoint;
 
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)) // Aplicamos la máscara aquí
             {
                 targetPoint = hit.point;
             }
             else
             {
-                // Si el raycast no impacta, establecer un punto lejano en la dirección de la cámara
-                targetPoint = ray.GetPoint(1000); // Puedes ajustar la distancia según tus necesidades
+                targetPoint = ray.GetPoint(1000);
             }
 
             // Calcular la dirección hacia el punto objetivo
             Vector3 direction = (targetPoint - firePoint.position).normalized;
-
-            // Calcular la rotación necesaria para que la bala apunte hacia el punto objetivo
             Quaternion lookRotation = Quaternion.LookRotation(direction);
-
-            // Aplicar una rotación adicional de -90 grados en el eje X para corregir la orientación del prefab
             Quaternion correctedRotation = lookRotation * Quaternion.Euler(90f, 0f, 0f);
 
-            // Instanciar la bala en el firePoint con la rotación corregida
+            // Instanciar y lanzar la bala
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, correctedRotation);
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
 
             if (rb != null)
             {
-                // Aplicar fuerza a la bala en la dirección calculada
                 rb.AddForce(direction * bulletForce, ForceMode.Impulse);
             }
 
-            // Destruir la bala después de 3 segundos para evitar acumulación de objetos
             Destroy(bullet, 3f);
         }
         else
