@@ -16,10 +16,11 @@ public class EnemyState : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform bulletSpawnPoint;
     [SerializeField] private float shootInterval = 1f;
-
+    
     private GameObject target;
     private Coroutine attackCoroutine;
     private NavMeshAgent agent;
+    private Animator animator; // Referencia al Animator
 
     private Vector3 lastKnownPosition;
     private Coroutine alertCoroutine;
@@ -27,16 +28,23 @@ public class EnemyState : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>(); // Obtener el Animator del enemigo
     }
 
     private void Start()
     {
-        state = State.Patrol;
+        SetState(State.Patrol);
     }
 
     public void SetState(State newState, GameObject player = null)
     {
         state = newState;
+
+        // Activar la animación de caminar en Patrol y Alert
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", newState == State.Patrol || newState == State.Alert);
+        }
 
         if (newState == State.Attack && player != null)
         {
@@ -113,8 +121,10 @@ public class EnemyState : MonoBehaviour
         if (target != null)
         {
             Vector3 shootDirection = (target.transform.position - bulletSpawnPoint.position).normalized;
-            
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
+            
+            Quaternion bulletRotation = Quaternion.LookRotation(shootDirection);
+            bullet.transform.rotation = bulletRotation;
             
             Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
             if (bulletRb != null)

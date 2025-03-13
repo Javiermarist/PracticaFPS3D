@@ -1,17 +1,17 @@
-using System;
 using UnityEngine;
 
 public class Trump : MonoBehaviour
 {
     [SerializeField] private float hp;
-    
+    [SerializeField] private GameObject bloodEffectPrefab; // Prefab de sangre
+
     private PlayerController playerController;
     private Rigidbody[] rigidbodies;
     private LineOfSightTrump lineOfSight;
     
     [SerializeField] private Animator animator;
     public ScriptMenu scriptMenu;
-    
+
     private void Start()
     {
         playerController = FindObjectOfType<PlayerController>();
@@ -38,14 +38,25 @@ public class Trump : MonoBehaviour
             Bullet bullet = other.gameObject.GetComponent<Bullet>();
             if (bullet != null)
             {
-                TakeDamage(bullet.damage);
+                Vector3 hitPosition = other.contacts[0].point; // Punto de impacto
+                TakeDamage(bullet.damage, hitPosition);
             }
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3 hitPosition)
     {
         hp -= damage;
+
+        // Crear una rotación aleatoria para el efecto de sangre
+        Quaternion randomRotation = Quaternion.Euler(Random.Range(-30f, 30f), Random.Range(0f, 360f), Random.Range(-30f, 30f));
+
+        // Instanciar el efecto de sangre en el punto de impacto con una rotación aleatoria
+        if (bloodEffectPrefab != null)
+        {
+            Instantiate(bloodEffectPrefab, hitPosition, randomRotation);
+        }
+
         if (hp <= 0)
         {
             Die();
@@ -80,10 +91,7 @@ public class Trump : MonoBehaviour
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
-            if (script != this)
-            {
-                script.enabled = false;
-            }
+            script.enabled = false;
         }
 
         scriptMenu.ShowWin();

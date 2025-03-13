@@ -1,49 +1,3 @@
-// using System.Collections.Generic;
-// using UnityEngine;
-// using UnityEngine.InputSystem;
-//
-// public class Shooting : MonoBehaviour
-// {
-//     public GameObject bulletPrefab;
-//     public Transform firePoint;
-//     public float bulletForce;
-//
-//     void Update()
-//     {
-//         if (Input.GetMouseButtonDown(0))
-//         {
-//             Shoot();
-//         }
-//     }
-//     
-//     private void OnTriggerEnter(Collider other)
-//     {
-//         if (other.CompareTag("Bullet"))
-//         {
-//             Destroy(other.gameObject);
-//         }
-//     }
-//
-//     void Shoot()
-//     {
-//         if (bulletPrefab != null && firePoint != null)
-//         {
-//             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-//             Rigidbody rb = bullet.GetComponent<Rigidbody>();
-//             if (rb != null)
-//             {
-//                 rb.AddForce(firePoint.forward * bulletForce, ForceMode.Impulse);
-//             }
-//             
-//             Destroy(bullet, 3f);
-//         }
-//         else
-//         {
-//             Debug.LogWarning("Falta asignar el prefab de la bala o el punto de disparo.");
-//         }
-//     }
-// }
-
 using UnityEngine;
 
 public class Shooting : MonoBehaviour
@@ -51,50 +5,63 @@ public class Shooting : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
     public float bulletForce = 20f;
-    public Camera playerCamera; // Asigna aquí la cámara del jugador
+    public Camera playerCamera;
+    public AudioSource shootSound;
+    
+    public GameObject AK47; // Referencia al objeto del AK-47
+    public float defaultFireRate = 0.5f; // Fire rate normal
+    public float akFireRate = 0.2f; // Fire rate más rápido para el AK-47
+
+    private float fireRate;
+    private float nextFireTime = 0f;
+
+    void Start()
+    {
+        UpdateFireRate();
+    }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        UpdateFireRate(); // Asegura que el fireRate cambie dinámicamente
+
+        if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
             Shoot();
+            nextFireTime = Time.time + fireRate;
         }
+    }
+
+    void UpdateFireRate()
+    {
+        // Si el AK-47 está activo, usar su fire rate, de lo contrario, usar el normal
+        fireRate = (AK47 != null && AK47.activeSelf) ? akFireRate : defaultFireRate;
     }
 
     void Shoot()
     {
         if (bulletPrefab != null && firePoint != null && playerCamera != null)
         {
-            // Definir un LayerMask para ignorar la capa de los enemigos (debe estar en el índice correcto)
-            int layerMask = ~LayerMask.GetMask("Enemy"); // El ~ invierte la máscara para ignorarla
+            int layerMask = ~LayerMask.GetMask("Enemy");
 
-            // Lanzar un raycast desde el centro de la cámara
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
-            Debug.DrawRay(ray.origin, ray.direction * 100, Color.red, 2f);
-            Vector3 targetPoint;
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)) // Aplicamos la máscara aquí
-            {
-                targetPoint = hit.point;
-            }
-            else
-            {
-                targetPoint = ray.GetPoint(1000);
-            }
-
-            // Calcular la dirección hacia el punto objetivo
+            Vector3 targetPoint = Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask) ? hit.point : ray.GetPoint(1000);
             Vector3 direction = (targetPoint - firePoint.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            Quaternion correctedRotation = lookRotation * Quaternion.Euler(90f, 0f, 0f);
+            Quaternion correctedRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(90f, 0f, 0f);
 
-            // Instanciar y lanzar la bala
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, correctedRotation);
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
 
             if (rb != null)
             {
                 rb.AddForce(direction * bulletForce, ForceMode.Impulse);
+            }
+
+            // Reproducir sonido de disparo
+            if (shootSound != null)
+            {
+                shootSound.Play();
             }
 
             Destroy(bullet, 3f);

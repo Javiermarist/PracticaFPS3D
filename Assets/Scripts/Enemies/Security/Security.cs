@@ -7,6 +7,7 @@ public class Security : MonoBehaviour
     [SerializeField] private float hp = 100f;
     [SerializeField] private Transform[] waypoints;
     [SerializeField] private float searchDuration = 10f;
+    [SerializeField] private GameObject bloodEffectPrefab; // Prefab de sangre
 
     private int currentWaypointIndex = 0;
     private PlayerController playerController;
@@ -14,7 +15,7 @@ public class Security : MonoBehaviour
     private Rigidbody[] rigidbodies;
     private Animator animator;
     private LineOfSight lineOfSight;
-    private EnemyState enemyState; // Referencia al script EnemyState
+    private EnemyState enemyState;
     private bool isSearching = false;
     private bool isDead = false;
 
@@ -25,7 +26,7 @@ public class Security : MonoBehaviour
         rigidbodies = GetComponentsInChildren<Rigidbody>();
         animator = GetComponent<Animator>();
         lineOfSight = GetComponent<LineOfSight>();
-        enemyState = GetComponent<EnemyState>(); // Obtiene el componente EnemyState
+        enemyState = GetComponent<EnemyState>();
 
         SetEnabled(false);
         GoToNextWaypoint();
@@ -37,12 +38,11 @@ public class Security : MonoBehaviour
 
         if (enemyState != null && enemyState.state == EnemyState.State.Attack && playerController != null)
         {
-            // Si está en estado de ataque, mirar al jugador
             Vector3 direction = playerController.transform.position - transform.position;
             direction.y = 0;
             transform.rotation = Quaternion.LookRotation(direction);
         }
-        else if (agent.velocity.sqrMagnitude > 0.1f) // Si no está atacando, mirar hacia adelante
+        else if (agent.velocity.sqrMagnitude > 0.1f)
         {
             Vector3 moveDirection = agent.velocity.normalized;
             moveDirection.y = 0;
@@ -91,14 +91,25 @@ public class Security : MonoBehaviour
             Bullet bullet = other.gameObject.GetComponent<Bullet>();
             if (bullet != null)
             {
-                TakeDamage(bullet.damage);
+                Vector3 hitPoint = other.contacts[0].point; // Obtiene el punto de impacto
+                TakeDamage(bullet.damage, hitPoint);
             }
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3 hitPosition)
     {
         hp -= damage;
+
+        // Rotación aleatoria en cualquier dirección
+        Quaternion randomRotation = Quaternion.Euler(Random.Range(-30f, 30f), Random.Range(0f, 360f), Random.Range(-30f, 30f));
+        
+        // Instanciar sangre en la posición exacta del impacto con rotación aleatoria
+        if (bloodEffectPrefab != null)
+        {
+            Instantiate(bloodEffectPrefab, hitPosition, randomRotation);
+        }
+
         if (hp <= 0)
         {
             Die();
@@ -129,6 +140,8 @@ public class Security : MonoBehaviour
         animator.enabled = false;
         SetEnabled(true);
 
+        gameObject.GetComponent<NavMeshAgent>().enabled = false;
+
         if (agent != null)
         {
             agent.isStopped = true;
@@ -151,10 +164,7 @@ public class Security : MonoBehaviour
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
-            if (script != this)
-            {
-                script.enabled = false;
-            }
+            script.enabled = false;
         }
     }
 }

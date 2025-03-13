@@ -24,7 +24,7 @@ public class LineOfSight : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player detected by " + gameObject.name);
+            //Debug.Log("Player detected by " + gameObject.name);
             target = other.gameObject;
             detectPlayerCoroutine = StartCoroutine(DetectPlayer());
             playerCollider = other;
@@ -35,7 +35,7 @@ public class LineOfSight : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player out of range of " + gameObject.name);
+            //Debug.Log("Player out of range of " + gameObject.name);
             target = null;
             StopCoroutine(detectPlayerCoroutine);
 
@@ -66,7 +66,7 @@ public class LineOfSight : MonoBehaviour
         
             if (points_hidden >= points.Length)
             {
-                Debug.Log("Player is hidden");
+                //Debug.Log("Player is hidden");
 
                 if (enemyState != null && enemyState.state == EnemyState.State.Attack)
                 {
@@ -79,7 +79,7 @@ public class LineOfSight : MonoBehaviour
             }
             else
             {
-                Debug.Log("Player is visible");
+                //Debug.Log("Player is visible");
 
                 if (enemyState != null && (enemyState.state == EnemyState.State.Alert || enemyState.state == EnemyState.State.Patrol))
                 {
@@ -92,7 +92,7 @@ public class LineOfSight : MonoBehaviour
     private bool IsPointCovered(Vector3 target_direction, float target_distance)
     {
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, target_direction, detectionCollider.radius);
-        Debug.DrawRay(transform.position, target_direction * detectionCollider.radius, Color.red, 0.1f);
+        //Debug.DrawRay(transform.position, target_direction * detectionCollider.radius, Color.red, 0.1f);
 
         foreach (RaycastHit hit in hits)
         {

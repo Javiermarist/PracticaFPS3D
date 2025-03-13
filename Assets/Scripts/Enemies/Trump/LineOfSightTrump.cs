@@ -106,10 +106,22 @@ public class LineOfSightTrump : MonoBehaviour
         {
             GameObject bullet = Instantiate(bulletPrefab, bulletSpawnPoint.position, Quaternion.identity);
             Vector3 direction = (target.transform.position - bulletSpawnPoint.position).normalized;
-            //bullet.transform.rotation = Quaternion.LookRotation(direction);
-            bullet.GetComponent<Rigidbody>().linearVelocity = direction * 20f;
+            
+            Quaternion bulletRotation = Quaternion.LookRotation(direction);
+            bullet.transform.rotation = bulletRotation;
+            
+            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+            if (bulletRb != null)
+            {
+                bulletRb.linearVelocity = direction * 20f;
+            }
+            else
+            {
+                Debug.LogError("La bala no tiene un Rigidbody asignado.");
+            }
         }
     }
+
 
     public void Die()
     {
