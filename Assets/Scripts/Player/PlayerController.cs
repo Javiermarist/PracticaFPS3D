@@ -1,8 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private float hp = 10f;
+    
+    [Header("Movement")]
     [SerializeField] private float speed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpHeight;
@@ -46,6 +50,20 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Jump");
             velocity.y = Mathf.Sqrt(1.2f * gravity * jumpHeight);
+        }
+    }
+    
+    public void TakeDamage(float damage)
+    {
+        hp -= damage;
+        if (hp <= 0)
+        {
+            Debug.Log("Player dead");
+            
+            Cursor.lockState = CursorLockMode.None; // Desbloquea el ratón
+            Cursor.visible = true; // Muestra el ratón
+            
+            SceneManager.LoadScene("Dead");
         }
     }
 }

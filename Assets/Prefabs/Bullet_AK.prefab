@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 443684697626541727}
   - component: {fileID: 7034937132103583846}
   - component: {fileID: 6467498051205405371}
-  - component: {fileID: 4573750840623640108}
+  - component: {fileID: 5438777843823646194}
   m_Layer: 0
   m_Name: Bullet_AK
   m_TagString: Bullet
@@ -75,7 +75,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
---- !u!65 &4573750840623640108
+--- !u!65 &5438777843823646194
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,8 +94,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 0}
-  m_Center: {x: 0, y: 0, z: 0.5}
+  m_Size: {x: 0.03727433, y: 0.1773231, z: 0.034339495}
+  m_Center: {x: 0.00038508698, y: -0.00028277934, z: -0.00013582502}
 --- !u!1 &7102794678351379646
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5906209232477094129}
   - component: {fileID: -5457401417545384675}
   - component: {fileID: -3424707268027073070}
+  - component: {fileID: 8329088169401825163}
   m_Layer: 2
   m_Name: Bullet_Pistol
   m_TagString: Bullet
@@ -74,6 +75,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!65 &8329088169401825163
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7301940072712396021}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.034376036, y: 0.09823643, z: 0.032482512}
+  m_Center: {x: 0.0001523768, y: 0.0007128492, z: 0.00016324595}
 --- !u!1 &7957020689985383652
 GameObject:
   m_ObjectHideFlags: 0
@@ -85,7 +107,7 @@ GameObject:
   - component: {fileID: 4074996660838739383}
   - component: {fileID: 7527810884867214842}
   - component: {fileID: 8238554367036616164}
-  - component: {fileID: 6999421729691212778}
+  - component: {fileID: 1443938772257834952}
   m_Layer: 2
   m_Name: SM_Bullet_06
   m_TagString: Untagged
@@ -161,7 +183,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6999421729691212778
+--- !u!64 &1443938772257834952
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

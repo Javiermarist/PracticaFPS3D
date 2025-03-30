@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Trump : MonoBehaviour
 {
@@ -10,7 +11,6 @@ public class Trump : MonoBehaviour
     private LineOfSightTrump lineOfSight;
     
     [SerializeField] private Animator animator;
-    public ScriptMenu scriptMenu;
 
     private void Start()
     {
@@ -93,7 +93,10 @@ public class Trump : MonoBehaviour
         {
             script.enabled = false;
         }
+        
+        Cursor.lockState = CursorLockMode.None; // Desbloquea el ratón
+        Cursor.visible = true; // Muestra el ratón
 
-        scriptMenu.ShowWin();
+        SceneManager.LoadScene("Won");
     }
 }

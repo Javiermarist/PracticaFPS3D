@@ -21,6 +21,7 @@ public class EnemyState : MonoBehaviour
     private Coroutine attackCoroutine;
     private NavMeshAgent agent;
     private Animator animator; // Referencia al Animator
+    private Security securityScript;  // Referencia al script Security
 
     private Vector3 lastKnownPosition;
     private Coroutine alertCoroutine;
@@ -29,6 +30,7 @@ public class EnemyState : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>(); // Obtener el Animator del enemigo
+        securityScript = GetComponent<Security>(); // Obtener el script Security del enemigo
     }
 
     private void Start()
@@ -39,6 +41,11 @@ public class EnemyState : MonoBehaviour
     public void SetState(State newState, GameObject player = null)
     {
         state = newState;
+
+        // Si el enemigo está muerto, no hacer nada más
+        if (state == State.Patrol && securityScript.isDead) return;
+        if (state == State.Attack && securityScript.isDead) return;
+        if (state == State.Alert && securityScript.isDead) return;
 
         // Activar la animación de caminar en Patrol y Alert
         if (animator != null)
@@ -75,13 +82,13 @@ public class EnemyState : MonoBehaviour
             else if (newState == State.Alert && player != null)
             {
                 lastKnownPosition = player.transform.position;
-                
+            
                 if (alertCoroutine != null)
                 {
                     StopCoroutine(alertCoroutine);
                     alertCoroutine = null;
                 }
-                
+            
                 alertCoroutine = StartCoroutine(SearchAround(lastKnownPosition));
             }
         }

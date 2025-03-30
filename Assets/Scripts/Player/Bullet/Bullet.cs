@@ -8,5 +8,11 @@ public class Bullet : MonoBehaviour
     {
         Debug.Log("Colision detectada con " + collision.gameObject.name);
         Destroy(gameObject);
+        
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            collision.gameObject.GetComponent<PlayerController>().TakeDamage(damage);
+            Destroy(gameObject);
+        }
     }
 }

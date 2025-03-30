@@ -17,7 +17,7 @@ public class Security : MonoBehaviour
     private LineOfSight lineOfSight;
     private EnemyState enemyState;
     private bool isSearching = false;
-    private bool isDead = false;
+    public bool isDead = false;
 
     private void Start()
     {
@@ -129,17 +129,18 @@ public class Security : MonoBehaviour
         animator.enabled = !enabled;
     }
 
-    private void Die()
+    public void Die()
     {
         Debug.Log("Security died");
         isDead = true;
 
+        // Desactivar el modelo, collider, y animaciones del enemigo
         transform.GetChild(0).gameObject.SetActive(false);
         GetComponent<BoxCollider>().enabled = false;
-
         animator.enabled = false;
         SetEnabled(true);
 
+        // Deshabilitar el agente de navegación
         gameObject.GetComponent<NavMeshAgent>().enabled = false;
 
         if (agent != null)
@@ -148,6 +149,7 @@ public class Security : MonoBehaviour
             agent.enabled = false;
         }
 
+        // Detener todas las corrutinas activas del enemigo
         if (lineOfSight != null)
         {
             lineOfSight.StopAllCoroutines();
@@ -156,15 +158,16 @@ public class Security : MonoBehaviour
 
         if (enemyState != null)
         {
-            enemyState.SetState(EnemyState.State.Patrol);
-            enemyState.StopAllCoroutines();
-            enemyState.enabled = false;
+            enemyState.SetState(EnemyState.State.Patrol);  // Cambiar a estado de patrulla si es necesario
+            enemyState.StopAllCoroutines();  // Detener todas las corrutinas activas
+            enemyState.enabled = false; // Deshabilitar el script EnemyState
         }
 
+        // Detener cualquier corrutina adicional en otros scripts si es necesario
         MonoBehaviour[] scripts = GetComponents<MonoBehaviour>();
         foreach (MonoBehaviour script in scripts)
         {
-            script.enabled = false;
+            script.enabled = false;  // Deshabilitar todos los scripts
         }
     }
 }
