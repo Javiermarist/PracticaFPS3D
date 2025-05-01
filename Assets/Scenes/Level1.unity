@@ -3102,7 +3102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 7301940072712396021, guid: ab0ea9841696e8f42883082c16bc2d37, type: 3}
   firePoint: {fileID: 1691745875}
-  bulletForce: 100
+  bulletForce: 150
   playerCamera: {fileID: 330585545}
   shootSound: {fileID: 508377790}
   AK47: {fileID: 649489110}
